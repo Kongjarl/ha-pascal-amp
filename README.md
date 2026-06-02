@@ -5,7 +5,7 @@ Control and monitor [Pascal Audio](https://pascal-audio.com) IP amplifiers
 polling-only — the integration keeps a live TCP connection and receives pushed
 updates from the amplifier.
 
-> Status: initial release (`0.1.0`). Built against the *Open API for Installers*
+> Current version: **`0.3.0`**. Built against the *Open API for Installers*
 > v1.8 (firmware 1.x).
 
 ## Features
@@ -144,9 +144,23 @@ to the UI without affecting Home Assistant stability.
 - Level meters are subscription-only and update at the amplifier's dynamic rate;
   they are coalesced into Home Assistant state writes, so expect ~second-level
   granularity, not metering-grade.
-- Advanced DSP (EQ, crossover, limiters, FIR, routing) is intentionally not
-  exposed; those are configured with the manufacturer's tools.
+- Input and Speaker EQ are exposed via services (see above) rather than as
+  per-band entities, to keep the device page uncluttered.
+- Other advanced DSP (crossover, limiters, FIR, output routing, ducking) has no
+  dedicated entities yet, but every register is reachable today via the
+  `pascal_amp.set_register` service.
+
+## Changelog
+
+- **0.3.0** — Speaker EQ: `set_speaker_eq_band` service (15 bands per output) and
+  a per-output Speaker EQ bypass switch.
+- **0.2.0** — Input gain/sensitivity, output gain/mute, input HPF/stereo/EQ-bypass
+  toggles; `set_input_eq_band` and `set_register` services.
+- **0.1.1** — Fix mDNS discovery to use the control port (7621) instead of the
+  advertised web port (80); config-flow now fails fast with a clear error.
+- **0.1.0** — Initial release: zone media players, power switch, status/diagnostic
+  sensors, fault/clip binary sensors, zeroconf + manual setup.
 
 ## License
 
-See repository.
+[MIT](LICENSE) © Pascal Audio.
