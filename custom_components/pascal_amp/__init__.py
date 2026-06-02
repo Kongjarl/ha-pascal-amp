@@ -11,12 +11,15 @@ from homeassistant.core import HomeAssistant
 from .api import PascalClient
 from .const import DEFAULT_PORT, DOMAIN
 from .coordinator import PascalCoordinator
+from .services import async_setup_services, async_unload_services
 
 _LOGGER = logging.getLogger(__name__)
 
 PLATFORMS: list[Platform] = [
     Platform.MEDIA_PLAYER,
     Platform.SWITCH,
+    Platform.NUMBER,
+    Platform.SELECT,
     Platform.SENSOR,
     Platform.BINARY_SENSOR,
 ]
@@ -38,6 +41,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: PascalConfigEntry) -> bo
 
     entry.runtime_data = coordinator
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+    async_setup_services(hass)
     entry.async_on_unload(entry.add_update_listener(_async_update_listener))
     return True
 
@@ -48,6 +52,13 @@ async def async_unload_entry(hass: HomeAssistant, entry: PascalConfigEntry) -> b
     if unload_ok:
         coordinator = entry.runtime_data
         await coordinator.async_shutdown()
+        # Remove services once the last amplifier entry is gone.
+        if not [
+            e
+            for e in hass.config_entries.async_entries(DOMAIN)
+            if e.entry_id != entry.entry_id
+        ]:
+            async_unload_services(hass)
     return unload_ok
 
 

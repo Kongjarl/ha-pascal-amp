@@ -2,11 +2,16 @@
 
 from __future__ import annotations
 
+import logging
+from collections.abc import Awaitable
+
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .api import PascalClient
+from .api import PascalClient, PascalError
 from .coordinator import PascalCoordinator
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class PascalEntity(CoordinatorEntity[PascalCoordinator]):
@@ -39,3 +44,17 @@ class PascalEntity(CoordinatorEntity[PascalCoordinator]):
         if data is None:
             return None
         return data.get(register)
+
+    async def _async_send(self, coro: Awaitable) -> bool:
+        """Run a client command, swallow link errors, and push fresh state.
+
+        Returns True on success. Never raises, so a transient amplifier issue
+        cannot bubble up and break the UI.
+        """
+        try:
+            await coro
+        except PascalError as err:
+            _LOGGER.warning("Command failed on %s: %s", self.entity_id, err)
+            return False
+        self.coordinator.async_set_updated_data(dict(self.client.cache))
+        return True

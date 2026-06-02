@@ -1,0 +1,98 @@
+set_input_eq_band:
+  name: Set input EQ band
+  description: >-
+    Configure one parametric EQ band on an analog input. Only the fields you
+    provide are changed.
+  target:
+    device:
+      integration: pascal_amp
+  fields:
+    input:
+      name: Input
+      description: Input channel id (e.g. 100 = Analog 1, 101 = Analog 2).
+      required: true
+      example: 100
+      selector:
+        number:
+          min: 100
+          max: 199
+          mode: box
+    band:
+      name: Band
+      description: EQ band number (1-5 for input EQ).
+      required: true
+      example: 1
+      selector:
+        number:
+          min: 1
+          max: 5
+          mode: box
+    type:
+      name: Type
+      description: Filter type for the band.
+      selector:
+        select:
+          options:
+            - PARAMETRIC
+            - LOWPASS_12
+            - HIGHPASS_12
+            - LOW_SHELF_Q
+            - HIGH_SHELF_Q
+    gain:
+      name: Gain
+      description: Band gain in dB.
+      selector:
+        number:
+          min: -15
+          max: 15
+          step: 0.1
+          unit_of_measurement: dB
+          mode: slider
+    frequency:
+      name: Frequency
+      description: Centre/corner frequency in Hz.
+      selector:
+        number:
+          min: 20
+          max: 20000
+          step: 1
+          unit_of_measurement: Hz
+          mode: box
+    q:
+      name: Q
+      description: Filter Q / bandwidth.
+      selector:
+        number:
+          min: 0.4
+          max: 30
+          step: 0.1
+          mode: box
+    bypass:
+      name: Bypass
+      description: Bypass (disable) this band.
+      selector:
+        boolean:
+
+set_register:
+  name: Set register (advanced)
+  description: >-
+    Write any amplifier register directly (escape hatch for controls not yet
+    exposed as entities). See the Open API register list. Use with care.
+  target:
+    device:
+      integration: pascal_amp
+  fields:
+    register:
+      name: Register
+      description: Full register name, e.g. OUT-1.OUTPUT_MODE or ZONE-A.DUCK.MODE.
+      required: true
+      example: OUT-1.OUTPUT_MODE
+      selector:
+        text:
+    value:
+      name: Value
+      description: Value to set. Strings with spaces are quoted automatically.
+      required: true
+      example: "100V"
+      selector:
+        text:

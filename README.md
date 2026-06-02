@@ -18,6 +18,11 @@ updates from the amplifier.
     source allow-list),
   - on/off (mutes the zone; whole-amp power is a separate switch).
 - **Power switch** for the whole amplifier (`POWER_ON` / `POWER_OFF`).
+- **Input controls**: gain (`number`), sensitivity (`select`: 14DBU / 4DBU /
+  -10DBV / MIC), and toggles for high-pass filter, stereo link and EQ bypass —
+  each created only for the channels that support it.
+- **Output controls**: gain (`number`) and mute (`switch`).
+- **EQ via services** (see below), keeping the entity list manageable.
 - **Status sensors**: amplifier state, input signal, output signal.
 - **Diagnostic sensors** (disabled by default): firmware, API version, serial,
   LAN / Wi-Fi IP.
@@ -69,6 +74,43 @@ python tools/probe.py 192.168.64.100 --subscribe 5
 
 This dumps every register and (optionally) streams live updates, using the same
 line-based protocol the integration uses.
+
+## Services
+
+### `pascal_amp.set_input_eq_band`
+Configure one parametric band of an analog input's 5-band EQ. Only the fields
+you pass are changed, so it's easy to script presets.
+
+```yaml
+service: pascal_amp.set_input_eq_band
+target:
+  device_id: <your amplifier device>
+data:
+  input: 100        # 100 = Analog 1, 101 = Analog 2, ...
+  band: 1           # 1..5
+  type: PARAMETRIC  # PARAMETRIC | LOWPASS_12 | HIGHPASS_12 | LOW_SHELF_Q | HIGH_SHELF_Q
+  gain: -3.0        # dB  (-15..15)
+  frequency: 120    # Hz  (20..20000)
+  q: 1.4            # 0.4..30
+  bypass: false
+```
+
+### `pascal_amp.set_register` (advanced)
+Write any register from the Open API directly — an escape hatch for controls
+not yet surfaced as entities (output mode, delay, limiters, ducking, etc.).
+Strings with spaces are quoted automatically.
+
+```yaml
+service: pascal_amp.set_register
+target:
+  device_id: <your amplifier device>
+data:
+  register: OUT-1.OUTPUT_MODE
+  value: "100V"
+```
+
+Both services accept multiple target devices and surface amplifier errors back
+to the UI without affecting Home Assistant stability.
 
 ## Notes / limitations
 
