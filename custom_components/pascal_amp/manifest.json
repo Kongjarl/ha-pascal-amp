@@ -1,0 +1,13 @@
+{
+  "domain": "pascal_amp",
+  "name": "Pascal IP Amplifier",
+  "codeowners": ["@Kongjarl"],
+  "config_flow": true,
+  "documentation": "https://github.com/Kongjarl/ha-pascal-amp",
+  "integration_type": "device",
+  "iot_class": "local_push",
+  "issue_tracker": "https://github.com/Kongjarl/ha-pascal-amp/issues",
+  "requirements": [],
+  "version": "0.1.0",
+  "zeroconf": ["_pasconnect._tcp.local."]
+}

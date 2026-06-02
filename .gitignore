@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Local tooling / agent config
+.claude/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# Proton Drive sync conflict artifacts
+*Name clash*
+
+# Vendor documentation (proprietary, not needed for the integration)
+*.pdf

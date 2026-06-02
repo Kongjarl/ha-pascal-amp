@@ -1,0 +1,73 @@
+{
+  "config": {
+    "flow_title": "{name}",
+    "step": {
+      "user": {
+        "title": "Connect to Pascal amplifier",
+        "description": "Enter the IP address (or hostname) of the amplifier. The default API port is 7621.",
+        "data": {
+          "host": "Host",
+          "port": "Port"
+        }
+      },
+      "zeroconf_confirm": {
+        "title": "Pascal amplifier found",
+        "description": "Do you want to set up {name} at {host}?"
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to the amplifier. Check the IP address, port and network.",
+      "unknown": "Unexpected error"
+    },
+    "abort": {
+      "already_configured": "This amplifier is already configured.",
+      "not_pascal_amp": "Discovered device is not a Pascal amplifier."
+    }
+  },
+  "entity": {
+    "switch": {
+      "power": { "name": "Power" }
+    },
+    "sensor": {
+      "state": {
+        "name": "Status",
+        "state": {
+          "init": "Initialising",
+          "standby": "Standby",
+          "on": "On",
+          "fault": "Fault"
+        }
+      },
+      "signal_in": {
+        "name": "Input signal",
+        "state": {
+          "off": "Off",
+          "no_signal": "No signal",
+          "signal": "Signal",
+          "clip": "Clipping"
+        }
+      },
+      "signal_out": {
+        "name": "Output signal",
+        "state": {
+          "off": "Off",
+          "no_signal": "No signal",
+          "signal": "Signal",
+          "clip": "Clipping",
+          "fault": "Fault"
+        }
+      },
+      "firmware": { "name": "Firmware version" },
+      "firmware_date": { "name": "Firmware date" },
+      "api_version": { "name": "API version" },
+      "serial": { "name": "Serial number" },
+      "lan_ip": { "name": "LAN IP address" },
+      "wifi_ip": { "name": "Wi-Fi IP address" }
+    },
+    "binary_sensor": {
+      "fault": { "name": "Fault" },
+      "input_clip": { "name": "Input clipping" },
+      "output_clip": { "name": "Output clipping" }
+    }
+  }
+}
