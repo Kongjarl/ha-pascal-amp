@@ -87,7 +87,10 @@ class PascalConfigFlow(ConfigFlow, domain=DOMAIN):
     ) -> ConfigFlowResult:
         """Handle discovery via mDNS (_pasconnect._tcp)."""
         host = discovery_info.host
-        port = discovery_info.port or DEFAULT_PORT
+        # The mDNS record advertises the amplifier's web/WebSocket port (80).
+        # The raw line-based control API this integration uses is always 7621,
+        # so ignore the advertised port and use the control port.
+        port = DEFAULT_PORT
         props = discovery_info.properties or {}
 
         # Only continue for Pascal amplifier services.

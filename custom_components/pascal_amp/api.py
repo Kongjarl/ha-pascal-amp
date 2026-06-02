@@ -382,9 +382,12 @@ class PascalClient:
         """
         await self._open_connection()
         try:
+            # One critical read with a short timeout: if the device does not
+            # answer the line protocol (wrong port, not a Pascal amp, etc.) this
+            # raises PascalError quickly instead of hanging the config flow.
+            await self._command("GET SYSTEM.DEVICE.MODEL_NAME", timeout=4.0)
             for register in (
                 "SYSTEM.DEVICE.SERIAL",
-                "SYSTEM.DEVICE.MODEL_NAME",
                 "SYSTEM.DEVICE.VENDOR_NAME",
                 "SYSTEM.DEVICE.MAC",
                 "SETUP.SYSTEM.DEVICE_NAME",
