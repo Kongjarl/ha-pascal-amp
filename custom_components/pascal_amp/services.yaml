@@ -73,6 +73,92 @@ set_input_eq_band:
       selector:
         boolean:
 
+set_speaker_eq_band:
+  name: Set speaker EQ band
+  description: >-
+    Configure one band of an output's Speaker EQ (up to 15 bands). Only the
+    fields you provide are changed. Note: bands are read-only while a locked
+    speaker preset is loaded on that output.
+  target:
+    device:
+      integration: pascal_amp
+  fields:
+    output:
+      name: Output
+      description: Output channel number (1-8, model dependent).
+      required: true
+      example: 1
+      selector:
+        number:
+          min: 1
+          max: 8
+          mode: box
+    band:
+      name: Band
+      description: Speaker EQ band number (1-15).
+      required: true
+      example: 1
+      selector:
+        number:
+          min: 1
+          max: 15
+          mode: box
+    type:
+      name: Type
+      description: Filter type for the band.
+      selector:
+        select:
+          options:
+            - PARAMETRIC
+            - LOWPASS_6
+            - HIGHPASS_6
+            - LOWPASS_12
+            - HIGHPASS_12
+            - LOW_SHELF_6
+            - LOW_SHELF_12
+            - HIGH_SHELF
+            - HIGH_SHELF_Q
+            - HIGH_SHELF_6
+            - HIGH_SHELF_12
+            - BANDPASS
+            - NOTCH
+            - ALLPASS_1
+            - ALLPASS_2
+    gain:
+      name: Gain
+      description: Band gain in dB.
+      selector:
+        number:
+          min: -15
+          max: 15
+          step: 0.1
+          unit_of_measurement: dB
+          mode: slider
+    frequency:
+      name: Frequency
+      description: Centre/corner frequency in Hz.
+      selector:
+        number:
+          min: 20
+          max: 20000
+          step: 1
+          unit_of_measurement: Hz
+          mode: box
+    q:
+      name: Q
+      description: Filter Q / bandwidth.
+      selector:
+        number:
+          min: 0.4
+          max: 30
+          step: 0.1
+          mode: box
+    bypass:
+      name: Bypass
+      description: Bypass (disable) this band.
+      selector:
+        boolean:
+
 set_register:
   name: Set register (advanced)
   description: >-

@@ -49,6 +49,20 @@ async def async_setup_entry(
                     invert_icon=True,
                 )
             )
+            # Speaker EQ bypass is an advanced register; only add it if present.
+            if f"OUT-{oid}.SPEAKER_EQ.BYPASS" in cache:
+                entities.append(
+                    PascalToggleSwitch(
+                        coordinator,
+                        register=f"OUT-{oid}.SPEAKER_EQ.BYPASS",
+                        name_register=key,
+                        key=f"out_{oid}_speaker_eq_bypass",
+                        suffix="speaker EQ bypass",
+                        fallback=f"Output {oid} speaker EQ bypass",
+                        entity_category=EntityCategory.CONFIG,
+                        icon="mdi:equalizer",
+                    )
+                )
         elif match := _INPUT_NAME_RE.match(key):
             iid = int(match.group(1))
             # Each toggle is created only if the amplifier exposes its register

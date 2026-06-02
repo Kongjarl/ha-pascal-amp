@@ -90,6 +90,29 @@ EQ_FREQ_MAX: Final = 20000.0
 EQ_Q_MIN: Final = 0.4
 EQ_Q_MAX: Final = 30.0
 
+# Output Speaker EQ (up to 15 bands; OUT-{OID}.SPEAKER_EQ-{EID}.*)
+SPEAKER_EQ_BANDS: Final = 15
+SPEAKER_EQ_GAIN_MIN: Final = -15.0
+SPEAKER_EQ_GAIN_MAX: Final = 15.0
+SPEAKER_EQ_TYPES: Final = [
+    "PARAMETRIC",
+    "LOWPASS_6",
+    "HIGHPASS_6",
+    "LOWPASS_12",
+    "HIGHPASS_12",
+    "LOW_SHELF_6",
+    "LOW_SHELF_12",
+    "HIGH_SHELF",
+    "HIGH_SHELF_Q",
+    "HIGH_SHELF_6",
+    "HIGH_SHELF_12",
+    "BANDPASS",
+    "NOTCH",
+    "ALLPASS_1",
+    "ALLPASS_2",
+]
+
 # --- Services -------------------------------------------------------------
 SERVICE_SET_INPUT_EQ_BAND: Final = "set_input_eq_band"
+SERVICE_SET_SPEAKER_EQ_BAND: Final = "set_speaker_eq_band"
 SERVICE_SET_REGISTER: Final = "set_register"

@@ -20,8 +20,13 @@ from .const import (
     INPUT_EQ_GAIN_MAX,
     INPUT_EQ_GAIN_MIN,
     INPUT_EQ_TYPES,
+    SPEAKER_EQ_BANDS,
+    SPEAKER_EQ_GAIN_MAX,
+    SPEAKER_EQ_GAIN_MIN,
+    SPEAKER_EQ_TYPES,
     SERVICE_SET_INPUT_EQ_BAND,
     SERVICE_SET_REGISTER,
+    SERVICE_SET_SPEAKER_EQ_BAND,
 )
 from .coordinator import PascalCoordinator
 
@@ -37,6 +42,28 @@ _EQ_SCHEMA = vol.Schema(
         vol.Optional("type"): vol.In(INPUT_EQ_TYPES),
         vol.Optional("gain"): vol.All(
             vol.Coerce(float), vol.Range(min=INPUT_EQ_GAIN_MIN, max=INPUT_EQ_GAIN_MAX)
+        ),
+        vol.Optional("frequency"): vol.All(
+            vol.Coerce(float), vol.Range(min=EQ_FREQ_MIN, max=EQ_FREQ_MAX)
+        ),
+        vol.Optional("q"): vol.All(
+            vol.Coerce(float), vol.Range(min=EQ_Q_MIN, max=EQ_Q_MAX)
+        ),
+        vol.Optional("bypass"): cv.boolean,
+    }
+)
+
+_SPEAKER_EQ_SCHEMA = vol.Schema(
+    {
+        vol.Required(ATTR_DEVICE_ID): vol.All(cv.ensure_list, [cv.string]),
+        vol.Required("output"): vol.All(vol.Coerce(int), vol.Range(min=1, max=8)),
+        vol.Required("band"): vol.All(
+            vol.Coerce(int), vol.Range(min=1, max=SPEAKER_EQ_BANDS)
+        ),
+        vol.Optional("type"): vol.In(SPEAKER_EQ_TYPES),
+        vol.Optional("gain"): vol.All(
+            vol.Coerce(float),
+            vol.Range(min=SPEAKER_EQ_GAIN_MIN, max=SPEAKER_EQ_GAIN_MAX),
         ),
         vol.Optional("frequency"): vol.All(
             vol.Coerce(float), vol.Range(min=EQ_FREQ_MIN, max=EQ_FREQ_MAX)
@@ -124,6 +151,28 @@ def async_setup_services(hass: HomeAssistant) -> None:
         for coordinator in _coordinators(hass, call.data[ATTR_DEVICE_ID]):
             await _apply(coordinator, ops)
 
+    async def _handle_set_speaker_eq_band(call: ServiceCall) -> None:
+        oid = call.data["output"]
+        band = call.data["band"]
+        prefix = f"OUT-{oid}.SPEAKER_EQ-{band}"
+        ops: list[tuple[str, str, bool]] = []
+        if "type" in call.data:
+            ops.append((f"{prefix}.TYPE", call.data["type"], False))
+        if "gain" in call.data:
+            ops.append((f"{prefix}.GAIN", f"{call.data['gain']:.2f}", False))
+        if "frequency" in call.data:
+            ops.append((f"{prefix}.FREQ", f"{call.data['frequency']:.2f}", False))
+        if "q" in call.data:
+            ops.append((f"{prefix}.Q", f"{call.data['q']:.3f}", False))
+        if "bypass" in call.data:
+            ops.append((f"{prefix}.BYPASS", "1" if call.data["bypass"] else "0", False))
+        if not ops:
+            raise HomeAssistantError(
+                "Provide at least one of: type, gain, frequency, q, bypass"
+            )
+        for coordinator in _coordinators(hass, call.data[ATTR_DEVICE_ID]):
+            await _apply(coordinator, ops)
+
     async def _handle_set_register(call: ServiceCall) -> None:
         register = call.data["register"].strip()
         value = call.data["value"]
@@ -134,6 +183,13 @@ def async_setup_services(hass: HomeAssistant) -> None:
         hass.services.async_register(
             DOMAIN, SERVICE_SET_INPUT_EQ_BAND, _handle_set_eq_band, schema=_EQ_SCHEMA
         )
+    if not hass.services.has_service(DOMAIN, SERVICE_SET_SPEAKER_EQ_BAND):
+        hass.services.async_register(
+            DOMAIN,
+            SERVICE_SET_SPEAKER_EQ_BAND,
+            _handle_set_speaker_eq_band,
+            schema=_SPEAKER_EQ_SCHEMA,
+        )
     if not hass.services.has_service(DOMAIN, SERVICE_SET_REGISTER):
         hass.services.async_register(
             DOMAIN, SERVICE_SET_REGISTER, _handle_set_register, schema=_SET_REGISTER_SCHEMA
@@ -142,6 +198,10 @@ def async_setup_services(hass: HomeAssistant) -> None:
 
 def async_unload_services(hass: HomeAssistant) -> None:
     """Remove integration services (call when the last entry unloads)."""
-    for service in (SERVICE_SET_INPUT_EQ_BAND, SERVICE_SET_REGISTER):
+    for service in (
+        SERVICE_SET_INPUT_EQ_BAND,
+        SERVICE_SET_SPEAKER_EQ_BAND,
+        SERVICE_SET_REGISTER,
+    ):
         if hass.services.has_service(DOMAIN, service):
             hass.services.async_remove(DOMAIN, service)

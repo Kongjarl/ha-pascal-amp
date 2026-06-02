@@ -95,6 +95,29 @@ data:
   bypass: false
 ```
 
+### `pascal_amp.set_speaker_eq_band`
+Configure one band of an output's Speaker EQ (up to 15 bands). Same idea as the
+input EQ service — only the fields you pass change. A per-output **Speaker EQ
+bypass** switch is also exposed so you can enable/disable the whole speaker EQ
+from the dashboard.
+
+```yaml
+service: pascal_amp.set_speaker_eq_band
+target:
+  device_id: <your amplifier device>
+data:
+  output: 1         # 1..8 (model dependent)
+  band: 3           # 1..15
+  type: PARAMETRIC  # PARAMETRIC, LOWPASS_6/12, HIGHPASS_6/12, *_SHELF_*, BANDPASS, NOTCH, ALLPASS_1/2
+  gain: 2.5         # dB  (-15..15)
+  frequency: 3000   # Hz  (20..20000)
+  q: 2.0            # 0.4..30
+  bypass: false
+```
+
+> Speaker EQ bands are read-only while a *locked speaker preset* is loaded on
+> that output; the amplifier will reject the change and it is reported in the UI.
+
 ### `pascal_amp.set_register` (advanced)
 Write any register from the Open API directly — an escape hatch for controls
 not yet surfaced as entities (output mode, delay, limiters, ducking, etc.).
